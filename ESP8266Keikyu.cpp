@@ -12,7 +12,8 @@ String ESP8266Keikyu::getUnkoInfo()
 
   // ページをすべてGETしようとすると落ちるので、ページの先頭からではなく途中からGETする
   // ページの構成が変わると死ぬ
-  int offset = 20000;
+  int offset = 20100;
+  int rangeSize = 1000;
 
   // 運行情報はこのコメントに囲まれている
   // コメントが変わると死ぬ
@@ -22,13 +23,13 @@ String ESP8266Keikyu::getUnkoInfo()
   http.begin("http://unkou.keikyu.co.jp/");
 
   // Rangeの設定をして、部分的にGETする
-  http.addHeader("Range", "bytes=" + String(offset) + "-" + String(offset + 10000));
+  http.addHeader("Range", "bytes=" + String(offset) + "-" + String(offset + rangeSize));
 
   int httpCode = http.GET();
 
   String result = "";
 
-  if (httpCode > 0 && http.getSize() > 0)
+  if (httpCode > 0 && http.getSize() > rangeSize)
   {
     result = http.getString();
   }
