@@ -1,6 +1,9 @@
 #include <ESP8266HTTPClient.h>
 #include "ESP8266Keikyu.h"
 
+// unko、unkoと叫んでいるがふざけているわけではない
+// 運行情報のページで、運行情報が書かれているdivのクラス名がunko-panelだからである
+
 int ESP8266Keikyu::getStatus()
 {
   return getUnkoStatus(getUnkoInfo());
