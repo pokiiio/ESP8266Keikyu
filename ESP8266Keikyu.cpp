@@ -15,7 +15,7 @@ String ESP8266Keikyu::getUnkoInfo()
 
   // ページをすべてGETしようとすると落ちるので、ページの先頭からではなく途中からGETする
   // ページの構成が変わると死ぬ
-  int offset = 20400;
+  int offset = 21000;
   int rangeSize = 1000;
 
   // 運行情報はこのコメントに囲まれている
