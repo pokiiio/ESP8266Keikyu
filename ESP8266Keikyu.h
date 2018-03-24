@@ -11,8 +11,10 @@ class ESP8266Keikyu
 {
 public:
   int getStatus();                    // 下で定義している定数を返します
-  String getUnkoInfo();               // 京急のページから運行情報の文字列を取得しますs
+  String getUnkoInfo();               // 京急のページから運行情報の文字列を取得します
   int getUnkoStatus(String unkoInfo); // 運行情報の文字列からステータスを判断します
+private:
+  String getUnkoInfoWithOffset(int offset); // Rangeを指定してHTTP-GETします
 };
 
 extern ESP8266Keikyu Keikyu;

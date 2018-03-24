@@ -1,6 +1,8 @@
 #include <ESP8266HTTPClient.h>
 #include "ESP8266Keikyu.h"
 
+int unkoInfoOffset = 0;
+
 // unko、unkoと叫んでいるがふざけているわけではない
 // 運行情報のページで、運行情報が書かれているdivのクラス名がunko-panelだからである
 
@@ -11,16 +13,39 @@ int ESP8266Keikyu::getStatus()
 
 String ESP8266Keikyu::getUnkoInfo()
 {
-  HTTPClient http;
-
-  // ページをすべてGETしようとすると落ちるので、ページの先頭からではなく途中からGETする
-  // ページの構成が変わると死ぬ
-  int offset = 21000;
-  int rangeSize = 1000;
-
   // 運行情報はこのコメントに囲まれている
   // コメントが変わると死ぬ
   String unkoPanelComment = "<!-- ======================== 運行情報 =================================== -->";
+
+  // 既存のオフセットでHTTP-GETする
+  String result = getUnkoInfoWithOffset(unkoInfoOffset);
+
+  // 既存のオフセットでHTTP-GETした時に、特定のコメントが含まれていなかったら、
+  // オフセットを0に戻して、ローラー作戦を開始する
+  if (result.indexOf(unkoPanelComment) < 0)
+  {
+    unkoInfoOffset = -500;
+
+    do
+    {
+      delay(1000);
+      unkoInfoOffset += 500;
+      result = getUnkoInfoWithOffset(unkoInfoOffset);
+    } while (result.indexOf(unkoPanelComment) < 0);
+  }
+
+  result = result.substring(result.indexOf(unkoPanelComment) + unkoPanelComment.length());
+  result = result.substring(0, result.indexOf(unkoPanelComment));
+
+  return result;
+}
+
+String ESP8266Keikyu::getUnkoInfoWithOffset(int offset)
+{
+  HTTPClient http;
+
+  // ページをすべてGETしようとすると落ちるので、ページの先頭からではなく途中からGETする
+  int rangeSize = 1000;
 
   // 京急の運行ページをパースします
   http.begin("http://unkou.keikyu.co.jp/");
@@ -38,13 +63,6 @@ String ESP8266Keikyu::getUnkoInfo()
   }
 
   http.end();
-
-  if (result.indexOf(unkoPanelComment) > 0)
-  {
-    result = result.substring(result.indexOf(unkoPanelComment) + unkoPanelComment.length());
-    result = result.substring(0, result.indexOf(unkoPanelComment));
-  }
-
   return result;
 }
 
