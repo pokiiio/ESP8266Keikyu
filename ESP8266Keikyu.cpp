@@ -15,14 +15,15 @@ String ESP8266Keikyu::getUnkoInfo()
 {
   // 運行情報はこのコメントに囲まれている
   // コメントが変わると死ぬ
-  String unkoPanelComment = "<!-- ======================== 運行情報 =================================== -->";
+  String unkoPanelCommentStart = "<div class=unko-panel>";
+  String unkoPanelCommentEnd = "</div>";
 
   // 既存のオフセットでHTTP-GETする
   String result = getUnkoInfoWithOffset(unkoInfoOffset);
 
   // 既存のオフセットでHTTP-GETした時に、特定のコメントが含まれていなかったら、
   // オフセットを0に戻して、ローラー作戦を開始する
-  if (result.indexOf(unkoPanelComment) < 0)
+  if (result.indexOf(unkoPanelCommentStart) < 0)
   {
     unkoInfoOffset = -500;
 
@@ -31,11 +32,11 @@ String ESP8266Keikyu::getUnkoInfo()
       delay(1000);
       unkoInfoOffset += 500;
       result = getUnkoInfoWithOffset(unkoInfoOffset);
-    } while (result.indexOf(unkoPanelComment) < 0);
+    } while (result.indexOf(unkoPanelCommentStart) < 0);
   }
 
-  result = result.substring(result.indexOf(unkoPanelComment) + unkoPanelComment.length());
-  result = result.substring(0, result.indexOf(unkoPanelComment));
+  result = result.substring(result.indexOf(unkoPanelCommentStart) + unkoPanelCommentStart.length());
+  result = result.substring(0, result.indexOf(unkoPanelCommentEnd));
 
   return result;
 }
